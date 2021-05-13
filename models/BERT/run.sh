@@ -22,7 +22,7 @@ worldsize=${1:-"1"}
 rank=${2:-"0"}
 init=${3:-"tcp://127.0.0.1:4444"}
 epochs=${4:-"1.0"}
-init_checkpoint=${5:-"./dataset/pytorch/bert_uncased.pt"}
+init_checkpoint=${5:-"./dataset/checkpoint/bert_large_qa.pt"}
 learning_rate=${6:-"3e-5"}
 precision=${7:-"fp32"}
 num_gpu=${8:-"1"}
@@ -31,7 +31,7 @@ squad_dir=${10:-"./dataset/squad/v1.1"}
 vocab_file=${11:-"./dataset/vocab.txt"}
 OUT_DIR=${12:-"."}
 mode=${13:-"train"}
-CONFIG_FILE=${14:-"./dataset/pytorch/bert_config.json"}
+CONFIG_FILE=${14:-"./dataset/checkpoint/bert_config.json"}
 max_steps=${15:-"200"}
 batch_size=${16:-"4"}
 
