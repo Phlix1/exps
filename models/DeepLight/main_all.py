@@ -59,7 +59,8 @@ np.random.seed(pars.random_seed)
 random.seed(pars.random_seed)
 torch.manual_seed(pars.random_seed)
 torch.cuda.manual_seed(pars.random_seed)
-save_model_name = './saved_models/' + pars.c + '_l2_' + str(pars.l2) + '_sparse_' + str(pars.sparse) + '_seed_' + str(pars.random_seed)
+#save_model_name = './saved_models/' + pars.c + '_l2_' + str(pars.l2) + '_sparse_' + str(pars.sparse) + '_seed_' + str(pars.random_seed)
+save_model_name = None
 
 criteo_num_feat_dim = set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
 result_index_org = np.load(f'{datadir}/Xi_train_tiny.npy')

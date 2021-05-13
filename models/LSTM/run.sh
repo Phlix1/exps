@@ -70,5 +70,5 @@ export GLOO_SOCKET_IFNAME=ens1f1
 export NCCL_SOCKET_IFNAME=ens1f1
 export NCCL_IB_HCA=mlx5_1
 
-${CONDA_PREFIX}/bin/python lm/main.py --data ./Google-Billion-Words/PyTorch_GBW_LM --backend $BACKEND  --shared_path ${shared_path} --batch_size $BATCH_SIZE --lr 1e-3 --init $INIT $PARAMS 
+python lm/main.py --data ./Google-Billion-Words/PyTorch_GBW_LM --backend $BACKEND  --shared_path ${shared_path} --batch_size $BATCH_SIZE --lr 1e-3 --init $INIT $PARAMS 
 

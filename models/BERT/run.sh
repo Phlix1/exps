@@ -67,7 +67,7 @@ fi
 
       #-x NCCL_DEBUG=INFO -x NCCL_IB_DISABLE=$nccl_ib_disable -x NCCL_SOCKET_IFNAME=ens1f0 -x SYNTHETIC_COMMUNICATION=omnireduce,10,256,1.0 -x SYNTHETIC_PROFILE=1  -np $num_gpu  --hostfile ./hostfile \
 
-CMD="${CONDA_PREFIX}/bin/python run_squad.py "
+CMD="python run_squad.py "
 CMD+="--init_checkpoint=$init_checkpoint "
 if [ "$mode" = "train" ] ; then
   CMD+="--do_train "
