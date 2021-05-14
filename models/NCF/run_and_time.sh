@@ -6,9 +6,32 @@ set -e
 #   run_and_time.sh <random seed 1-5>
 
 THRESHOLD=1.0
+BACKEND=""
+INIT=""
 
 # Get command line seed
-seed=${1:-1}
+seed=1
+while (( "$#" )); do
+    case "$1" in
+        --backend)
+	    BACKEND=$2
+	    shift 2
+	    ;;
+	--init)
+	    INIT=$2
+	    shift 2
+	    ;;
+	--seed)
+	    seed=$2
+	    shift 2
+	    ;;
+	--)
+	    shift
+	    break
+	    ;;
+    esac
+done
+            
 
 # Get the multipliers for expanding the dataset
 USER_MUL=${USER_MUL:-4}
@@ -19,7 +42,7 @@ ITEM_MUL=${ITEM_MUL:-16}
 start=$(date +%s)
 start_fmt=$(date +%Y-%m-%d\ %r)
 echo "STARTING TIMING RUN AT $start_fmt"
-OMPI_COMM_WORLD_LOCAL_RANK=0 NCCL_DEBUG=INFO CUDA_VISIBLE_DEVICES=1 NCCL_IB_DISABLE=0 GLOO_SOCKET_IFNAME=ens1f1  NCCL_SOCKET_IFNAME=ens1f1 python ncf.py \
+python ncf.py \
     -l 0.0002 \
     -b 1048576 \
     --layers 256 256 128 64 \
@@ -30,7 +53,9 @@ OMPI_COMM_WORLD_LOCAL_RANK=0 NCCL_DEBUG=INFO CUDA_VISIBLE_DEVICES=1 NCCL_IB_DISA
     --item_scaling ${ITEM_MUL} \
     --cpu_dataloader \
     --random_negatives \
-    --backend gloo
+    --backend ${BACKEND} \
+    --init ${INIT}
+
 # end timing
 end=$(date +%s)
 end_fmt=$(date +%Y-%m-%d\ %r)

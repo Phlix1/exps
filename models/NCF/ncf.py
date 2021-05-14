@@ -87,6 +87,8 @@ def parse_args():
                         help='do not check train negatives for existence in dataset')
     parser.add_argument('--backend', default='nccl', type=str,
                         help='backend for distributed processing')
+    parser.add_argument('--init', default='tcp://127.0.0.1:4000', type=str,
+                        help='init method for distributed')
     return parser.parse_args()
 
 
