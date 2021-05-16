@@ -17,23 +17,40 @@
 
 echo "Container nvidia build = " $NVIDIA_BUILD_ID
 nccl_ib_disable=0
-backend="gloo"
-worldsize=${1:-"1"}
-rank=${2:-"0"}
-init=${3:-"tcp://127.0.0.1:4444"}
-epochs=${4:-"1.0"}
-init_checkpoint=${5:-"./dataset/checkpoint/bert_large_qa.pt"}
-learning_rate=${6:-"3e-5"}
-precision=${7:-"fp32"}
-num_gpu=${8:-"1"}
-seed=${9:-"1"}
-squad_dir=${10:-"./dataset/squad/v1.1"}
-vocab_file=${11:-"./dataset/vocab.txt"}
-OUT_DIR=${12:-"."}
-mode=${13:-"train"}
-CONFIG_FILE=${14:-"./dataset/checkpoint/bert_config.json"}
-max_steps=${15:-"200"}
-batch_size=${16:-"4"}
+BACKEND="gloo"
+INIT="tcp://127.0.0.1:4444"
+
+while (( "$#" )); do
+    case "$1" in
+        --backend)
+	    BACKEND=$2
+	    shift 2
+	    ;;
+	--init)
+	    INIT=$2
+	    shift 2
+	    ;;
+	--)
+	    shift
+	    break
+	    ;;
+    esac
+done
+
+
+epochs="1.0"
+init_checkpoint="./dataset/checkpoint/bert_large_qa.pt"
+learning_rate="3e-5"
+precision="fp32"
+num_gpu="1"
+seed="1"
+squad_dir="./dataset/squad/v1.1"
+vocab_file="./dataset/vocab.txt"
+OUT_DIR="."
+mode="train"
+CONFIG_FILE="./dataset/checkpoint/bert_config.json"
+max_steps="200"
+batch_size="4"
 
 
 echo "out dir is $OUT_DIR"
@@ -49,23 +66,6 @@ if [ "$precision" = "fp16" ] ; then
   use_fp16=" --fp16 "
 fi
 
-if [ "$num_gpu" = "-1" ] ; then
-  export CUDA_VISIBLE_DEVICES=0
-  mpi_command=""
-else
-  #unset CUDA_VISIBLE_DEVICES
-  export CUDA_VISIBLE_DEVICES=0
-  export OMPI_COMM_WORLD_SIZE=$worldsize
-  export OMPI_COMM_WORLD_RANK=$rank
-  export OMPI_COMM_WORLD_LOCAL_RANK=0
-  export NCCL_DEBUG=INFO
-  export GLOO_SOCKET_IFNAME=ens1f1 
-  export NCCL_SOCKET_IFNAME=ens1f1 
-  export NCCL_IB_HCA=mlx5_1
-  #mpi_command="OMPI_COMM_WORLD_SIZE=$worldsize OMPI_COMM_WORLD_RANK=$rank OMPI_COMM_WORLD_LOCAL_RANK=0 CUDA_VISIBLE_DEVICES=1 NCCL_DEBUG=INFO NCCL_IB_DISABLE=$nccl_ib_disable GLOO_SOCKET_IFNAME=ens1f1 NCCL_SOCKET_IFNAME=ens1f1 NCCL_IB_HCA=mlx5_1 "
-fi
-
-      #-x NCCL_DEBUG=INFO -x NCCL_IB_DISABLE=$nccl_ib_disable -x NCCL_SOCKET_IFNAME=ens1f0 -x SYNTHETIC_COMMUNICATION=omnireduce,10,256,1.0 -x SYNTHETIC_PROFILE=1  -np $num_gpu  --hostfile ./hostfile \
 
 CMD="python run_squad.py "
 CMD+="--init_checkpoint=$init_checkpoint "
@@ -106,8 +106,8 @@ CMD+=" --output_dir=$OUT_DIR "
 CMD+=" --vocab_file=$vocab_file "
 CMD+=" --config_file=$CONFIG_FILE "
 CMD+=" --max_steps=$max_steps "
-CMD+=" --dist-backend=$backend "
-CMD+=" --init=$init "
+CMD+=" --dist-backend=$BACKEND "
+CMD+=" --init=$INIT "
 CMD+=" $use_fp16"
 
 echo "$CMD"
