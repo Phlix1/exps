@@ -3,6 +3,7 @@ We fine-tune a pretrained BERT model on [SQuAD v1.1](https://rajpurkar.github.io
 
 ## Requirements
 Aside from PyTorch with OmniReduce, ensure you have `tqdm`, `dllogger` and `apex`.
+
 **Install Dependencies** :
 
     pip install tqdm
@@ -22,7 +23,7 @@ Aside from PyTorch with OmniReduce, ensure you have `tqdm`, `dllogger` and `apex
 
 ## BERT Training
 ### 1. Create and edit omnireduce.cfg
-- Read this [example](https://github.com/Phlix1/omnireduce/tree/master/example) and create the your own `omnireduce.cfg` according to the cluster information.
+- Read this [example](https://github.com/Phlix1/omnireduce/tree/master/example) and create the your own `omnireduce.cfg` according to the cluster information.(Note: `buffer_size` needs to be set 2048 for BERT.)
 - Copy the `omnireduce.cfg` to all the aggregators and workers. And `omnireduce.cfg` needs to be in the same directory as the PyTorch script (for workers) or program `aggregator` (for aggregators).
 ### 2. Run aggregators
 Aggregator 0 and aggregator 1:

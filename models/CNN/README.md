@@ -5,6 +5,8 @@ We use the training scripts provided by [Nvidia DALI](https://docs.nvidia.com/de
 Aside from PyTorch with OmniReduce, ensure you have 
 `Pillow`, `torchvision`, `DALI` and `apex`.
 
+**Install Dependencies** :
+
     pip install Pillow
     pip install torchvision===0.8.0 --no-dependencies
     pip install --extra-index-url https://developer.download.nvidia.com/compute/redist --upgrade nvidia-dali-cuda100

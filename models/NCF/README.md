@@ -3,6 +3,7 @@ Our script relies on [this](https://github.com/mlcommons/training/tree/master/re
 
 ## Requirements
 Aside from PyTorch with OmniReduce, ensure you have `numpy-indexed` and `mlperf_compliance`.
+
 **Install Dependencies** :
 
     conda install -y -c conda-forge numpy-indexed
