@@ -2,6 +2,7 @@
 i=1
 wnum=0
 anum=0
+mode="RDMA"
 while read line; do
 
 if [[ $line =~ "num_workers"  ]]
@@ -13,6 +14,15 @@ if [[ $line =~ "num_aggregators"  ]]
 then
     anum=$((${line: 18}))
     echo "Aggregator number: $anum"
+fi
+if [[ $line =~ "direct_memory"  ]]
+then
+    mode_num=$((${line: 16}))
+    if [[ "$mode_num" -eq "1" ]]
+    then
+        mode="GDR"
+    fi
+    echo "mode: $mode"
 fi
 if [[ $line =~ "worker_ips"  ]]
 then
@@ -67,9 +77,9 @@ for density in $densities; do
     done
     # start workers
     i=0
-    while [ $i -lt $anum ]
+    while [ $i -lt $wnum ]
     do
-        ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/benchmark; mkdir -p ./100G-results/${wnum}/omnireduce-GDR/ ; export CUDA_VISIBLE_DEVICES=1; export GLOO_SOCKET_IFNAME=ens1f1; nohup /usr/local/conda/bin/python benchmark.py -d ${density} --backend gloo -t 26214400 -r $i -s ${wnum} --ip ${worker_arr[0]} > ./100G-results/${wnum}/omnireduce-GDR/${density}.log 2>&1 &"
+        ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/benchmark; mkdir -p ./100G-results/${wnum}/omnireduce-${mode}/ ; export CUDA_VISIBLE_DEVICES=1; export GLOO_SOCKET_IFNAME=ens1f1; nohup /usr/local/conda/bin/python benchmark.py -d ${density} --backend gloo -t 26214400 -r $i -s ${wnum} --ip ${worker_arr[0]} > ./100G-results/${wnum}/omnireduce-${mode}/${density}.log 2>&1 &"
         i=$((i+1))
     done
     # check completed
