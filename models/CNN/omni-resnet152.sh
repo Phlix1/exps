@@ -66,7 +66,7 @@ done
 i=0
 while [ $i -lt $wnum ]
 do
-    ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/models/CNN; mkdir -p ./100G-results/omnireduce/ ; export CUDA_VISIBLE_DEVICES=1; export GLOO_SOCKET_IFNAME=ens1f1; export PATH=$PATH:/usr/local/conda/bin; nohup python main.py -a resnet152 --lr 0.1 --world-size ${wnum} --rank ${i} --dist-url tcp://${worker_arr[0]}:4000 --dist-backend gloo  ./dataset/ > ./100G-results/omnireduce/ResNet152_log.txt 2>&1 &"
+    ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/models/CNN; mkdir -p ./100G-results/omnireduce/ ; export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}; export GLOO_SOCKET_IFNAME=${GLOO_SOCKET_IFNAME}; export PATH=$PATH:/usr/local/conda/bin; nohup python main.py -a resnet152 --lr 0.1 --world-size ${wnum} --rank ${i} --dist-url tcp://${worker_arr[0]}:4000 --dist-backend gloo  ./dataset/ > ./100G-results/omnireduce/ResNet152_log.txt 2>&1 &"
     i=$((i+1))
 done
 # check completed

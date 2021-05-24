@@ -93,7 +93,7 @@ for density in $densities; do
     i=0
     while [ $i -lt $wnum ]
     do
-        ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/benchmark; mkdir -p ./100G-results/${wnum}/omnireduce-${mode}/ ; export CUDA_VISIBLE_DEVICES=1; export GLOO_SOCKET_IFNAME=ens1f1; nohup /usr/local/conda/bin/python benchmark.py -d ${density} --backend gloo -t 26214400 -r $i -s ${wnum} --ip ${worker_arr[0]} > ./100G-results/${wnum}/omnireduce-${mode}/${density}-${block_size}-${message_size}.log 2>&1 &"
+        ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/benchmark; mkdir -p ./100G-results/${wnum}/omnireduce-${mode}/ ; export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}; export GLOO_SOCKET_IFNAME=${GLOO_SOCKET_IFNAME}; nohup /usr/local/conda/bin/python benchmark.py -d ${density} --backend gloo -t 26214400 -r $i -s ${wnum} --ip ${worker_arr[0]} > ./100G-results/${wnum}/omnireduce-${mode}/${density}-${block_size}-${message_size}.log 2>&1 &"
         i=$((i+1))
     done
     # check completed

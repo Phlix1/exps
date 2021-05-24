@@ -65,7 +65,7 @@ done < omnireduce.cfg
 i=0
 while [ $i -lt $wnum ]
 do
-    ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/models/CNN; mkdir -p ./100G-results/NCCL/ ; export CUDA_VISIBLE_DEVICES=1; export NCCL_SOCKET_IFNAME=ens1f1; export NCCL_DEBUG=INFO; export NCCL_IB_HCA=${ib_hca}:${ib_port}; export PATH=$PATH:/usr/local/conda/bin;nohup python main.py -a vgg19 --lr 0.01 --world-size ${wnum} --rank ${i} --dist-url tcp://${worker_arr[0]}:4000 --dist-backend nccl ./dataset/ >./100G-results/NCCL/VGG19_log.txt 2>&1 &"
+    ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/models/CNN; mkdir -p ./100G-results/NCCL/ ; export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}; export NCCL_SOCKET_IFNAME=${NCCL_SOCKET_IFNAME}; export NCCL_DEBUG=INFO; export NCCL_IB_HCA=${ib_hca}:${ib_port}; export PATH=$PATH:/usr/local/conda/bin;nohup python main.py -a vgg19 --lr 0.01 --world-size ${wnum} --rank ${i} --dist-url tcp://${worker_arr[0]}:4000 --dist-backend nccl ./dataset/ >./100G-results/NCCL/VGG19_log.txt 2>&1 &"
     i=$((i+1))
 done
 # check completed

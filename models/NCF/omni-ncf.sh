@@ -66,7 +66,7 @@ done
 i=0
 while [ $i -lt $wnum ]
 do
-    ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/models/NCF; mkdir -p ./100G-results/omnireduce/ ; export CUDA_VISIBLE_DEVICES=1; export GLOO_SOCKET_IFNAME=ens1f1; export OMPI_COMM_WORLD_SIZE=${wnum}; export OMPI_COMM_WORLD_RANK=$i; export OMPI_COMM_WORLD_LOCAL_RANK=0; export PATH=$PATH:/usr/local/conda/bin; nohup ./run_and_time.sh  --init tcp://${worker_arr[0]}:4000 --backend gloo > ./100G-results/omnireduce/log.txt 2>&1 &"
+    ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/models/NCF; mkdir -p ./100G-results/omnireduce/ ; export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}; export GLOO_SOCKET_IFNAME=${GLOO_SOCKET_IFNAME}; export OMPI_COMM_WORLD_SIZE=${wnum}; export OMPI_COMM_WORLD_RANK=$i; export OMPI_COMM_WORLD_LOCAL_RANK=0; export PATH=$PATH:/usr/local/conda/bin; nohup ./run_and_time.sh  --init tcp://${worker_arr[0]}:4000 --backend gloo > ./100G-results/omnireduce/log.txt 2>&1 &"
     i=$((i+1))
 done
 # check completed

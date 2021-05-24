@@ -65,7 +65,7 @@ done < omnireduce.cfg
 i=0
 while [ $i -lt $wnum ]
 do
-    ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/models/DeepLight; mkdir -p ./100G-results/NCCL/ ; export CUDA_VISIBLE_DEVICES=1; export NCCL_SOCKET_IFNAME=ens1f1; export NCCL_DEBUG=INFO; export NCCL_IB_HCA=${ib_hca}:${ib_port}; export OMPI_COMM_WORLD_SIZE=${wnum}; export OMPI_COMM_WORLD_RANK=$i; export OMPI_COMM_WORLD_LOCAL_RANK=0; nohup /usr/local/conda/bin/python main_all.py -l2 6e-7 -n_epochs 2 -warm 2 -prune 1 -sparse 0.90  -prune_deep 1 -prune_fm 1 -prune_r 1 -use_fwlw 1 -emb_r 0.444 -emb_corr 1. -backend nccl -batch_size 2048  -init tcp://${worker_arr[0]}:4000 > ./100G-results/NCCL/log.txt 2>&1 &"
+    ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/models/DeepLight; mkdir -p ./100G-results/NCCL/ ; export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}; export NCCL_SOCKET_IFNAME=${NCCL_SOCKET_IFNAME}; export NCCL_DEBUG=INFO; export NCCL_IB_HCA=${ib_hca}:${ib_port}; export OMPI_COMM_WORLD_SIZE=${wnum}; export OMPI_COMM_WORLD_RANK=$i; export OMPI_COMM_WORLD_LOCAL_RANK=0; nohup /usr/local/conda/bin/python main_all.py -l2 6e-7 -n_epochs 2 -warm 2 -prune 1 -sparse 0.90  -prune_deep 1 -prune_fm 1 -prune_r 1 -use_fwlw 1 -emb_r 0.444 -emb_corr 1. -backend nccl -batch_size 2048  -init tcp://${worker_arr[0]}:4000 > ./100G-results/NCCL/log.txt 2>&1 &"
     i=$((i+1))
 done
 # check completed
