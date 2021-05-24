@@ -65,11 +65,19 @@ done < omnireduce.cfg
 i=0
 while [ $i -lt $wnum ]
 do
-    if [[ ${mode} -eq "GDR" ]]
+    if [[ "GDR" =~ ${mode} ]]
     then
     ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/benchmark; mkdir -p ./100G-results/${wnum}/NCCL-${mode}/ ; export CUDA_VISIBLE_DEVICES=1; export NCCL_SOCKET_IFNAME=ens1f1; export NCCL_DEBUG=INFO; export NCCL_IB_HCA=${ib_hca}:${ib_port}; nohup /usr/local/conda/bin/python benchmark.py -d 1.0 --backend nccl -t 26214400 -r $i -s ${wnum} --ip ${worker_arr[0]} > ./100G-results/${wnum}/NCCL-${mode}/1.0.log 2>&1 &"
     else
     ssh -p 2222 ${worker_arr[$i]} "cd /home/exps/benchmark; mkdir -p ./100G-results/${wnum}/NCCL-${mode}/ ; export CUDA_VISIBLE_DEVICES=1; export NCCL_SOCKET_IFNAME=ens1f1; export NCCL_NET_GDR_LEVEL=0; export NCCL_IB_HCA=${ib_hca}:${ib_port}; export NCCL_DEBUG=INFO; nohup /usr/local/conda/bin/python benchmark.py -d 1.0 --backend nccl -t 26214400 -r $i -s ${wnum} --ip ${worker_arr[0]} > ./100G-results/${wnum}/NCCL-${mode}/1.0.log 2>&1 &"
     fi
     i=$((i+1))
+done
+# check completed
+while [[ 1 ]]
+do
+    count=`ps -ef |grep python |grep -v "grep" |wc -l`
+    if [ 0 == $count ];then
+        break
+    fi
 done
