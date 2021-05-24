@@ -6,7 +6,7 @@ This document introduces how to reproduce the evaluation of OmniReduce of RDMA a
 * Validate results
 * Produce paper's plots
 ## Hardware
-Our experiments require 8 CPU servers to work as `aggregators` and 8 GPU servers to work as `workers`. Each GPU server has one GPU. To reproduce the evaluation in our SIGCOMM'21 paper,  GPUs need to support GPUDirect. The network bandwidth between each aggregator and each worker is 100Gbps.
+Our experiments require 8 CPU servers to work as `aggregators` and 8 GPU servers to work as `workers`. Each GPU server has one GPU. To reproduce the evaluation in our SIGCOMM'21 paper, GPUs need to support GPUDirect which you can configure according to [Mellanox OFED GPUDirect RDMA](https://www.mellanox.com/products/GPUDirect-RDMA). The network bandwidth between each aggregator and each worker is 100Gbps.
 ## Run experiments
 Our experiments include two parts. The first is the **micro-benchmark** experiment, which tests allreduce latency on 100MB tensors with different parameters (sparsity, worker number...). The second is the **end-to-end** experiment, which tests the training time of six deep learning models including DeepLight, LSTM, NCF, BERT, ResNet152 and VGG19. We have written several distributed scripts for running OmniReduce experiments with multiple workers and aggregators. You only need to update the configuration file `omnireduce.cfg` and run these scripts on the **worker-0** node, and then the programs of other nodes including workers and aggregators will be launched automatically.
 
