@@ -10,7 +10,7 @@ Our experiments require 8 CPU servers to work as `aggregators` and 8 GPU servers
 ## Run experiments
 Our experiments include two parts. The first is the **micro-benchmark** experiment, which tests allreduce latency on 100MB tensors with different parameters (sparsity, worker number...). The second is the **end-to-end** experiment, which tests the training time of six deep learning models including DeepLight, LSTM, NCF, BERT, ResNet152 and VGG19. We have written several distributed scripts for running OmniReduce experiments with multiple workers and aggregators. You only need to update the configuration file `omnireduce.cfg` and run these scripts on the **worker-0** node, and then the programs of other nodes including workers and aggregators will be launched automatically.
 
-For ease of introduction, assume that the network interface to use is `ens1f1` and IB interface to use is `mlx5_1:1` for workers and aggregators and the IP addresses of 8 workers and 8 aggregators are as follows:
+For ease of introduction, assume that the network interface to use is `ens1f1` and IB interface to use is `mlx5_1:1` for workers and aggregators. The index of GPU to use is 1 and the IP addresses of 8 workers and 8 aggregators are as follows:
 | Worker number | IP address | Aggregator number | IP address |
 |--|--|--|--|
 | 0 | 10.0.0.10 | 0 | 10.0.0.20 |
@@ -74,7 +74,7 @@ These scripts only need to be run on the `worker-0`, the commands are as follows
 
 	      # now you are in docker environment
 	      cd /home/exps/benchmark
-	      ./nccl-benchmark.sh
+	      CUDA_VISIBLE_DEVICES=1 NCCL_SOCKET_IFNAME=ens1f1 ./nccl-benchmark.sh
     
 	    After running this script, the result files will be saved in `/home/exps/benchmark/100G-results/2/NCCL-GDR/`. `2` in the path string refers to the number of workers. `NCCL-GDR` refers to that GDR is used in this run and it will become `NCCL-RDMA` if you set `direct_memory` to 0 in `omnireduce.cfg`. The result files are saved in this format, `${density}.log`, where `density` means the proportion of non-zero data (e.g. `0.8.log`).
 
@@ -82,7 +82,7 @@ These scripts only need to be run on the `worker-0`, the commands are as follows
 
 	      # now you are in docker environment
 	      cd /home/exps/benchmark
-	      ./omni-benchmark.sh
+	      CUDA_VISIBLE_DEVICES=1 GLOO_SOCKET_IFNAME=ens1f1 ./omni-benchmark.sh
 
 		After running this script, the result files will be saved in `/home/exps/benchmark/100G-results/2/omnireduce-GDR/`. `2` in the path string refers to the number of workers. `omnireduce-GDR` refers to that GDR is used in this run and it will become `omnireduce-RDMA` if you set `direct_memory` to 0 in `omnireduce.cfg`.
 		**NOTE: to reproduce our results, you need to run the above scripts with 2, 4 and 8 workers and aggregators for NCCL and omnireduce. And both GDR and RDMA (w/o GDR) need to be tested.**
@@ -102,7 +102,7 @@ These scripts only need to be run on the `worker-0`, the commands are as follows
 
 	  # now you are in docker environment
 	  cd /home/exps/benchmark
-	  ./omni-bf-benchmark.sh
+	  CUDA_VISIBLE_DEVICES=1 GLOO_SOCKET_IFNAME=ens1f1 ./omni-bf-benchmark.sh
 
 	After running this script, the result files will be saved in `/home/exps/benchmark/100G-results/2/omnireduce-RDMA/`.The result files of this experiment  are saved in this format, `${density}-${block_size}-${message_size}.log`, where `density` means the proportion of non-zero data and `block_size` and `message_size` are the values specified in `omnireduce.cfg` (e.g. `0.8-256-1024.log`).
 
@@ -142,13 +142,13 @@ Below is a `omnireduce.cfg` for end-to-end experiments.
 
 	      # now you are in docker environment
 	      cd /home/exps/models/DeepLight
-	      ./nccl-deeplight.sh
+	      CUDA_VISIBLE_DEVICES=1 NCCL_SOCKET_IFNAME=ens1f1 ./nccl-deeplight.sh
 
 		For `omni-deeplight.sh`:
 
 	      # now you are in docker environment
 	      cd /home/exps/models/DeepLight
-	      ./omni-deeplight.sh
+	      CUDA_VISIBLE_DEVICES=1 GLOO_SOCKET_IFNAME=ens1f1 ./omni-deeplight.sh
 	
 		After running the above commands,  the output files are `/home/exps/models/DeepLight/100G-results/NCCL/log.txt` and `/home/exps/models/DeepLight/100G-results/omnireduce/log.txt`.
 	- (2). LSTM
@@ -157,13 +157,13 @@ Below is a `omnireduce.cfg` for end-to-end experiments.
 
 	      # now you are in docker environment
 	      cd /home/exps/models/LSTM
-	      ./nccl-lstm.sh
+	      CUDA_VISIBLE_DEVICES=1 NCCL_SOCKET_IFNAME=ens1f1 ./nccl-lstm.sh
 
 		For `omni-lstm.sh`:
 
 	      # now you are in docker environment
 	      cd /home/exps/models/LSTM
-	      ./omni-lstm.sh
+	      CUDA_VISIBLE_DEVICES=1 GLOO_SOCKET_IFNAME=ens1f1 ./omni-lstm.sh
 	
 		After running the above commands,  the output files are `/home/exps/models/LSTM/100G-results/NCCL/log.txt` and `/home/exps/models/LSTM/100G-results/omnireduce/log.txt`.
 	- (3). NCF
@@ -172,13 +172,13 @@ Below is a `omnireduce.cfg` for end-to-end experiments.
 
 	      # now you are in docker environment
 	      cd /home/exps/models/NCF
-	      ./nccl-ncf.sh
+	      CUDA_VISIBLE_DEVICES=1 NCCL_SOCKET_IFNAME=ens1f1 ./nccl-ncf.sh
 
 		For `omni-ncf.sh`:
 
 	      # now you are in docker environment
 	      cd /home/exps/models/NCF
-	      ./omni-ncf.sh
+	      CUDA_VISIBLE_DEVICES=1 GLOO_SOCKET_IFNAME=ens1f1 ./omni-ncf.sh
 	
 		After running the above commands,  the output files are `/home/exps/models/NCF/100G-results/NCCL/log.txt` and `/home/exps/models/NCF/100G-results/omnireduce/log.txt`.
 
@@ -188,13 +188,13 @@ Below is a `omnireduce.cfg` for end-to-end experiments.
 
 	      # now you are in docker environment
 	      cd /home/exps/models/BERT
-	      ./nccl-bert.sh
+	      CUDA_VISIBLE_DEVICES=1 NCCL_SOCKET_IFNAME=ens1f1 ./nccl-bert.sh
 
 		For `omni-bert.sh`:
 
 	      # now you are in docker environment
 	      cd /home/exps/models/BERT
-	      ./omni-bert.sh
+	      CUDA_VISIBLE_DEVICES=1 GLOO_SOCKET_IFNAME=ens1f1 ./omni-bert.sh
 	
 		After running the above commands,  the output files are `/home/exps/models/BERT/100G-results/NCCL/log.txt` and `/home/exps/models/BERT/100G-results/omnireduce/log.txt`.
 	- (5). ResNet152
@@ -203,13 +203,13 @@ Below is a `omnireduce.cfg` for end-to-end experiments.
 
 	      # now you are in docker environment
 	      cd /home/exps/models/CNN
-	      ./nccl-resnet152.sh
+	      CUDA_VISIBLE_DEVICES=1 NCCL_SOCKET_IFNAME=ens1f1 ./nccl-resnet152.sh
 
 		For `omni-resnet152.sh`:
 
 	      # now you are in docker environment
 	      cd /home/exps/models/CNN
-	      ./omni-resnet152.sh
+	      CUDA_VISIBLE_DEVICES=1 GLOO_SOCKET_IFNAME=ens1f1 ./omni-resnet152.sh
 	
 		After running the above commands,  the output files are `/home/exps/models/CNN/100G-results/NCCL/ResNet152_log.txt` and `/home/exps/models/CNN/100G-results/omnireduce/ResNet152_log.txt`.
 	- (6). VGG19
@@ -218,13 +218,13 @@ Below is a `omnireduce.cfg` for end-to-end experiments.
 
 	      # now you are in docker environment
 	      cd /home/exps/models/CNN
-	      ./nccl-vgg19.sh
+	      CUDA_VISIBLE_DEVICES=1 NCCL_SOCKET_IFNAME=ens1f1 ./nccl-vgg19.sh
 
 		For `omni-vgg19.sh`:
 
 	      # now you are in docker environment
 	      cd /home/exps/models/CNN
-	      ./omni-vgg19.sh
+	      CUDA_VISIBLE_DEVICES=1 GLOO_SOCKET_IFNAME=ens1f1 ./omni-vgg19.sh
 	
 		After running the above commands,  the output files are `/home/exps/models/CNN/100G-results/NCCL/VGG19_log.txt` and `/home/exps/models/CNN/100G-results/omnireduce/VGG19_log.txt`.
 ## Validate results
@@ -232,7 +232,7 @@ Below is a `omnireduce.cfg` for end-to-end experiments.
 The output of the experiments will validate the following claims:
 
 - Figure 4, Figure 5 and Figure 13: `/usr/local/omnireduce/example/100G-results/` reproduces Figure 4, Figure 5 and Figure 13 on Page 8, 9 and 12.
-- Figure 10: `/home/exps/models/DeepLight/results`, `/home/exps/models/LSTM/results`, `/home/exps/models/NCF/results`, `/home/exps/models/BERT/results` and `/home/exps/models/CNN/results`  reproduce Figure 10 on Page 10. 
+- Figure 10: `/home/exps/models/DeepLight/results`, `/home/exps/models/LSTM/results`, `/home/exps/models/NCF/results`, `/home/exps/models/BERT/results` and `/home/exps/models/CNN/results`  reproduce Figure 10 on Page 10. (Note that the results of DeepLight, NCF, ResNet152 and VGG19 will be better than the paper's as we just use a tiny dataset for these model training in this docker image. The entire dataset is too large to be placed in the image.)
 
 ## Produce paper's plots
 To produce paper's plots, we provide `benckmark-rdma.ipynb` and `e2e-rdma.ipynb` in `/home/exps/notebook`. To start the notebook server, run the following commands on `worker-0`:
