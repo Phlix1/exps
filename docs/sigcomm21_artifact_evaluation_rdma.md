@@ -121,7 +121,7 @@ These scripts only need to be run on the `worker-0`, the commands are as follows
 	| 32/1024 | 32/32 |
 	| 64/1024 | 64/64 |
 	| 128/1024 | 128/128 |
- 	| 256/1024 | 128/128 |
+ 	| 256/1024 | 256/256 |
  	
 	 We use `omni-bf-benchmark.sh` to run this experiment. And we still only need to run the following commands on `worker-0` node.
 	 For `omni-bf-benchmark.sh` (~3 minutes)
