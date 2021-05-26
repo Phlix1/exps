@@ -133,7 +133,7 @@ These scripts only need to be run on the `worker-0`, the commands are as follows
 	After running this script, the result files will be saved in `/home/exps/benchmark/100G-results/2/omnireduce-RDMA/`.The result files of this experiment  are saved in this format, `${density}-${block_size}-${message_size}.log`, where `density` means the proportion of non-zero data and `block_size` and `message_size` are the values specified in `omnireduce.cfg` (e.g. `0.8-256-1024.log`). The total time to run this experiment is about **24 minutes** (3 minutes * 8).
 
 ### 2. End-to-end (~80 minutes)
-In the end-to-end experiments, we use 8 workers and 8 aggregators to train 6 deep learning models including DeepLight, LSTM, NCF, BERT, ResNet152 and VGG19. Below, we introduce how to run these models one by one.
+In the end-to-end experiments, we use 8 workers and 8 aggregators to train 6 deep learning models including DeepLight, LSTM, NCF, BERT, ResNet152 and VGG19. We provide a tiny dataset for these model training in this docker image, so you do not need to download the dataset. Below, we introduce how to run these models one by one.
 * **Update configuration file**
 Similar to the benchmark, you need to update the `omnireduce.cfg` before running end-to-end experiments. The `omnireduce.cfg` files for all the models are almost the same. (**Note that the only difference is `buffer_size`, which needs to be set 2048 for BERT training and 1024 for other models.**)
 Below is a `omnireduce.cfg` for end-to-end experiments.

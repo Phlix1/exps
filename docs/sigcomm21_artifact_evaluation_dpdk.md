@@ -1,4 +1,4 @@
-# SIGCOMM 2021 Artifact Evaluation Getting Start Guide for OmniReduce (RDMA)
+# SIGCOMM 2021 Artifact Evaluation Getting Start Guide for OmniReduce (DPDK)
 This document introduces how to reproduce the evaluation of OmniReduce DPDK version in our SIGCOMM'21 paper. We use Docker to minimize the impact of environment difference.
 ## Overview
 * Hardware
@@ -105,7 +105,7 @@ for density in 1.0 0.4 0.1 0.01; do nvidia-docker run --env CUDA_VISIBLE_DEVICES
 ```
 
 ### 2. End-to-end
-In the end-to-end experiments, we use 8 workers and 8 aggregators to train 6 deep learning models including DeepLight, LSTM, NCF, BERT, ResNet152 and VGG19. We provide `omnireduce-dpdk-e2e.sh` and `nccl-tcpip-e2e.sh`for ease of execution.
+In the end-to-end experiments, we use 8 workers and 8 aggregators to train 6 deep learning models including DeepLight, LSTM, NCF, BERT, ResNet152 and VGG19. We provide a tiny dataset for these model training in this docker image, so you do not need to download the dataset. We provide `omnireduce-dpdk-e2e.sh` and `nccl-tcpip-e2e.sh`for ease of execution.
 You need to:
 1. Launch aggregators as described above if you are using omnireduce-DPDK
 2. Ensure every worker have exported `RANK` environment variable, and then run the two scripts on every worker machine., e.g.,
