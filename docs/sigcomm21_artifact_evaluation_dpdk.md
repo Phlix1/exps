@@ -7,11 +7,11 @@ This document introduces how to reproduce the evaluation of OmniReduce DPDK vers
 * Produce paper's plots
 ## Hardware
 The DPDK evaluations in the paper are run with 8 physical CPU (dual 8-core Intel Xeon Silver 4108 at 1.80 GHz) servers working as `aggregators`, and 8 physical GPU servers (1 NVIDIA P100 GPU per server, dual 10-core CPUIntel Xeon E5-2630 v4 at 2.20 GHz) working as `workers`. They are interconnected with 10Gbps bandwidth links.
-## Software Prerequisites
+## Prerequisites
 - root priveledge
 - Docker (for workers, NVIDIA container toolkit is required to run end-to-end experiments, See [NVIDIA Container Toolkit User Guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/user-guide.html))
 - DPDK:
-While we try to minimize dependency setups for compilation through docker, to run DPDK applications, you are required to configure your systems following the [DPDK User Guide](https://doc.dpdk.org/guides-19.11/linux_gsg/sys_reqs.html#Running-DPDK-Applications). Depending on your NIC hardware, you may need to change PCI driver bindings using the `dpdk-devbind.py` script (packaged inside the docker image). See [DPDK Network Interface Controller Drivers](https://doc.dpdk.org/guides/nics/) for more information. (Reference: https://github.com/usnistgov/ndn-dpdk/blob/main/docs/Docker.md#prepare-the-host-machine)
+While we try to minimize dependency setups for compilation through docker, to run DPDK applications, you are required to configure your systems following the [DPDK User Guide](https://doc.dpdk.org/guides-19.11/linux_gsg/sys_reqs.html#Running-DPDK-Applications). Depending on your NIC hardware (in our environment, Intel NICs requires binding to the igb_uio driver while Mellanox NICs don't), you may need to change PCI driver bindings using the `dpdk-devbind.py` script (available inside the docker image). See [DPDK Network Interface Controller Drivers](https://doc.dpdk.org/guides/nics/) for more information. (Reference: https://github.com/usnistgov/ndn-dpdk/blob/main/docs/Docker.md#prepare-the-host-machine)
 ## Run experiments
 Our experiments include two parts. The first is the **micro-benchmark** experiment, which tests allreduce latency on 100MB tensors with different parameters (sparsity, worker number). The second is the **end-to-end** experiment, which tests the training time of six deep learning models including DeepLight, LSTM, NCF, BERT, ResNet152 and VGG19.
 
@@ -30,10 +30,9 @@ For ease of introduction, we assume the network interface cards are named `ens1f
 ### Prepare Docker container environment
 We prebuilt docker images which you can fetch by:
 ```bash
-docker pull phlix/omnireduce-dpdk:latest
-docker pull phlix/omnireduce-dpdk-aggregator:latest
+docker pull chenyuho/omnireduce-dpdk:latest
+docker pull chenyuho/omnireduce-dpdk-aggregator:latest
 ```
-
 The building process of Omnireduce-DPDK is kernel version dependent. Although the above prebuilt image might just work fine, we recommend that you build the docker image yourself if you run a different kernel version from our servers (4.15.0). You can do this by:
 ```bash
 mkdir -p /tmp/omnireduce
@@ -41,7 +40,7 @@ cd /tmp/omnireduce
 wget https://raw.githubusercontent.com/ChenYuHo/omnireduce/docker/docker/Dockerfile
 docker build -t omnireduce-dpdk -f ./Dockerfile .
 ```
-The `omnireduce-dpdk` Docker image can serve as both workers and aggregators. If you prefer a slim image without CUDA libraries or you run a different linux kervel version for your aggregators, you can do:
+The `omnireduce-dpdk` Docker image can serve as both workers and aggregators. If you prefer a slim image without CUDA libraries or you run a different linux kervel version for your aggregator machines, you can do:
 ```bash
 mkdir -p /tmp/omnireduce
 cd /tmp/omnireduce
@@ -59,7 +58,38 @@ docker rm $CTID
 ### Edit config files
 The worker processes will first look for `/etc/daiet.cfg`, then `daiet-$(hostname).cfg` in the working directory, and finally, `daiet.cfg` in the working directory.
 Similarly, the aggregator processes look for `/etc/ps.cfg`, `ps-$(hostname).cfg`, and `ps.cfg`.
-
+We put sample config files in `exps/dpdk-exp-utils`, you should edit the config files according to your system settings. We list some of the config entries that require your attention:
+- `worker_ip`: This field only takes one IP, so if your working directory is accessible to all worker machines you either need to use the `daiet-$(hostname).cfg`format or change to another directory.
+- `ps_ips`: This field takes all aggregator NIC IPs (separated by a comma and a space ", "). Note that, if your NIC requires binding to the DPDK driver, it does not have an IP anymore. Simply put unique but valid IP strings for each worker and aggregator and the system will work. Actually, in our implementation, IPs are not checked during packet processing.
+- `ps_macs`: This field takes all aggregator NIC MACs (separated by a comma and a space ", "). You will need to record MACs before binding them to the DPDK driver (if applicable).
+- `worker_port`and `ps_port`: a unused port
+- `extra_eal_options`: we put `-w <[domain:]bus:devid.func>` which adds a PCI device in white list to ensure DPDK uses the corect device. You can get a list of NIC PCI addresses by
+	```bash
+	$ lspci -nn | grep Ether
+	18:00.0 Ethernet controller [0200]: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network Connection [8086:10fb] (rev 01)
+	86:00.0 Ethernet controller [0200]: Intel Corporation I350 Gigabit Network Connection [8086:1521] (rev 01)
+	
+	# or, by DPDK devbind script
+	$ python usertools/dpdk-devbind.py --status
+	0000:18:00.0 '82599ES 10-Gigabit SFI/SFP+ Network Connection 10fb' if=ens1f0 drv=ixgbe unused=
+	0000:86:00.0 'I350 Gigabit Network Connection 1521' if=enp134s0f0 drv=igb unused= *Active*
+	
+	``` 
+	Refer to https://doc.dpdk.org/guides-19.11/linux_gsg/linux_eal_parameters.html for more options
+- `cores`: we always use 4 cores for workers and aggregators in our experiments. To ensure best performance you need to bind to cores that are on the same socket with the NIC. You can check this by:
+	```bash
+	# assume you want to bind NIC 18:00.0
+	$ cat /sys/bus/pci/devices/0000\:18\:00.0/numa_node
+	1
+	```
+	Next, you can check NUMA information with
+	```bash
+	$ lscpu | grep NUMA
+	NUMA node(s):        2
+	NUMA node0 CPU(s):   0-7,16-23
+	NUMA node1 CPU(s):   8-15,24-31
+	```
+	We should choose NUMA node 1 CPU cores, thus the `10-13` in the sample config file.
 
 ### Launching Aggregators
 All experiments with omnireduce-DPDK share the same way of launching aggregators. You need to launch aggregators **before** launching workers. On each aggregator host mchine:
