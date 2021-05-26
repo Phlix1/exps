@@ -31,7 +31,9 @@ For ease of introduction, we assume the network interface cards are named `ens1f
 We prebuilt docker images which you can fetch by:
 ```bash
 docker pull chenyuho/omnireduce-dpdk:latest
+docker tag chenyuho/omnireduce-dpdk:latest omnireduce-dpdk:latest 
 docker pull chenyuho/omnireduce-dpdk-aggregator:latest
+docker tag chenyuho/omnireduce-dpdk-aggregator:latest omnireduce-dpdk-aggregator:latest
 ```
 The building process of Omnireduce-DPDK is kernel version dependent. Although the above prebuilt image might just work fine, we recommend that you build the docker image yourself if you run a different kernel version from our servers (4.15.0). You can do this by:
 ```bash
@@ -118,7 +120,7 @@ NW=2
 RANK=0
 export NCCL_SOCKET_IFNAME=ens1f0
 WORKER0_IP=11.0.0.201
-nvidia-docker run --env CUDA_VISIBLE_DEVICES=0 --env NCCL_SOCKET_IFNAME --env NCCL_IB_DISABLE=1 --env NCCL_DEBUG=INFO --network=host --rm omnireduce-dpdk python /root/exps/benchmark/benchmark.py -d 1.0 --backend nccl -t 26214400 --ip ${WORKER0_IP} -s $NW -r $RANK > ./10G-results/${NW}-${RANK}/NCCL-TCPIP/1.0.log
+nvidia-docker run --env CUDA_VISIBLE_DEVICES=0 --env NCCL_SOCKET_IFNAME --env NCCL_IB_DISABLE=1 --env NCCL_DEBUG=INFO --network=host --rm omnireduce-dpdk python /root/exps/benchmark/benchmark.py -d 1.0 --backend nccl -t 26214400 --ip ${WORKER0_IP} -s $NW -r $RANK | tee ./10G-results/${NW}-${RANK}/NCCL-TCPIP/1.0.log
 ```
 
 - omnireduce-DPDK
@@ -131,7 +133,7 @@ NW=2
 RANK=0
 export GLOO_SOCKET_IFNAME=ens1f0
 WORKER0_IP=11.0.0.201
-for density in 1.0 0.4 0.1 0.01; do nvidia-docker run --env CUDA_VISIBLE_DEVICES=0 --env GLOO_SOCKET_IFNAME  --privileged --network=host --rm -v `pwd`:/workspace -w /workspace --mount type=bind,source=/dev/hugepages,target=/dev/hugepages $(find /dev -name 'uio*' -type c -printf ' --device %p') --device /dev/vfio omnireduce-dpdk python /root/exps/benchmark/benchmark.py -d ${density} --backend gloo -t 26214400 --ip ${WORKER0_IP} -s $NW -r $RANK > ./10G-results/${NW}-${RANK}/omnireduce-DPDK/${density}.log; done
+for density in 1.0 0.4 0.1 0.01; do nvidia-docker run --env CUDA_VISIBLE_DEVICES=0 --env GLOO_SOCKET_IFNAME  --privileged --network=host --rm -v `pwd`:/workspace -w /workspace --mount type=bind,source=/dev/hugepages,target=/dev/hugepages $(find /dev -name 'uio*' -type c -printf ' --device %p') --device /dev/vfio omnireduce-dpdk python /root/exps/benchmark/benchmark.py -d ${density} --backend gloo -t 26214400 --ip ${WORKER0_IP} -s $NW -r $RANK | tee ./10G-results/${NW}-${RANK}/omnireduce-DPDK/${density}.log; done
 ```
 
 ### 2. End-to-end
@@ -151,6 +153,7 @@ export RANK=1
 ./nccl-tcpip-e2e.sh
 
 # vice versa for wokers 2-7
+# You need to change NW in the scripts if you want to use a different number of workers
 ```
 ## Validate results
 
