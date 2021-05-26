@@ -36,7 +36,7 @@ def init_distributed(args):
         THIS MUST BE DONE AS SOON AS POSSIBLE.
         '''
         torch.cuda.set_device(args.local_rank)
-        torch.distributed.init_process_group(backend=args.backend, init_method=f'tcp://10.200.0.31:44444', world_size=args.world_size, rank=args.rank)
+        torch.distributed.init_process_group(backend=args.backend, init_method=args.init, world_size=args.world_size, rank=args.rank)
     else:
         args.rank=0
         args.local_rank = 0
