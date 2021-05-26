@@ -142,6 +142,7 @@ You need to:
 1. Launch aggregators as described above if you are using omnireduce-DPDK
 2. Ensure every worker have exported `RANK` environment variable, and then run the two scripts on every worker machine., e.g.,
 ```bash
+# Note: This may take more than an hour depending on your hardware. Please refer to the RDMA guide for more detailed timing estimates.
 # on worker 0
 export RANK=0
 ./omnireduce-dpdk-e2e.sh
@@ -162,10 +163,9 @@ The output of the experiments will validate the following figures:
 - End-to-end experiments: Figure 10
 
 ## Produce paper's plots
-To produce paper's plots, we provide `benckmark-dpdk.ipynb` and `e2e-dpdk.ipynb` in `/root/exps/notebook`. To start the notebook server, run the following commands on `worker-0`:
-
-    # now you are in docker environment
-    cd /home/exps/notebook
+To produce paper's plots, we provide `benckmark-dpdk.ipynb` and `e2e-dpdk.ipynb` in `exps/notebook`. If you don't have jupyter environment, you can run the following commands inside worker 0 omnireduce-dpdk container:
+```bash
+    cd exps # where "10G-results" should reside
     jupyter notebook --ip 11.0.0.201 --port 8888 --allow-root
-
+```
 After running the notebook server, you can copy/paste the *URL* into your browser and produce paper's plots.
