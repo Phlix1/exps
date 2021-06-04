@@ -17,8 +17,12 @@ Aggregator 0 and aggregator 1:
 ### 3. Run workers
 Worker 0:
 
-    CUDA_VISIBLE_DEVICES=0 GLOO_SOCKET_IFNAME=eth0 python benchmark.py  -d 1.0 --backend gloo -t 26214400 -r 0 -s 2 --ip IP_OF_NODE0
+    NCCL_DEBUG=INFO LOCAL_RANK=0 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=eth0 python benchmark.py  -d 1.0 --backend gloo -t 26214400 -r 0 -s 4 --ip IP_OF_NODE0
+
+    NCCL_DEBUG=INFO LOCAL_RANK=1 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=eth0 python benchmark.py  -d 1.0 --backend gloo -t 26214400 -r 1 -s 4 --ip IP_OF_NODE0
 
 Worker 1:
 
-    CUDA_VISIBLE_DEVICES=0 GLOO_SOCKET_IFNAME=eth0 python benchmark.py  -d 1.0 --backend gloo -t 26214400 -r 1 -s 2 --ip IP_OF_NODE0
+    NCCL_DEBUG=INFO LOCAL_RANK=0 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=eth0 python benchmark.py  -d 1.0 --backend gloo -t 26214400 -r 2 -s 4 --ip IP_OF_NODE0
+
+    NCCL_DEBUG=INFO LOCAL_RANK=1 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=eth0 python benchmark.py  -d 1.0 --backend gloo -t 26214400 -r 3 -s 4 --ip IP_OF_NODE0

@@ -60,7 +60,8 @@ def get_expected_result(worldsize, tensorsize, blocksize, density, allreduce_tim
     return data
 
 def benchmark(rank, world_size, tensorsize, blocksize, density, check):
-    local_rank = 0
+    local_rank = os.getenv('LOCAL_RANK')
+    local_rank = int(local_rank)
     torch.cuda.set_device(local_rank)
     mydevice = torch.device("cuda", local_rank)
     begin = time.time()

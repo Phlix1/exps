@@ -852,12 +852,12 @@ def main():
 
     args.world_size = int(os.environ.get('OMPI_COMM_WORLD_SIZE', 0))
     args.rank = int(os.environ.get('OMPI_COMM_WORLD_RANK', 0))
-    args.local_rank = int(os.environ.get('OMPI_COMM_WORLD_LOCAL_RANK', -1))
+    args.local_rank = int(os.environ.get('LOCAL_RANK', -1))
     
     from distutils.util import strtobool
     args.synthetic_profile = strtobool(os.environ.get('SYNTHETIC_PROFILE', 'off'))
-    if args.local_rank > 0:
-        os.environ['CUDA_VISIBLE_DEVICES'] = str(args.local_rank)
+    #if args.local_rank > 0:
+    #    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.local_rank)
 
 
     #if args.local_rank == -1 or args.no_cuda:
@@ -869,7 +869,8 @@ def main():
     #    # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
     #    torch.distributed.init_process_group(backend='nccl', init_method='env://')
     n_gpu = 1
-    device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+    #device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+    device = torch.device("cuda", args.local_rank)
     shared_file = os.path.join(args.shared_path, "python_init_process_group")
     torch.distributed.init_process_group(backend=args.dist_backend, init_method=args.init, world_size=args.world_size, rank=args.rank)
 

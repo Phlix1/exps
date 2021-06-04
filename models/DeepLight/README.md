@@ -21,8 +21,12 @@ Aggregator 0 and aggregator 1:
 ### 3. Run workers
 Worker 0:
 
-    CUDA_VISIBLE_DEVICES=0 GLOO_SOCKET_IFNAME=eth0 OMPI_COMM_WORLD_SIZE=2 OMPI_COMM_WORLD_RANK=0 OMPI_COMM_WORLD_LOCAL_RANK=0 python main_all.py -l2 6e-7 -n_epochs 2 -warm 2 -prune 1 -sparse 0.90  -prune_deep 1 -prune_fm 1 -prune_r 1 -use_fwlw 1 -emb_r 0.444 -emb_corr 1. -backend gloo -batch_size 2048  -init tcp://IP_OF_NODE0:FREEPORT
+    NCCL_DEBUG=INFO LOCAL_RANK=0 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=eth0 OMPI_COMM_WORLD_SIZE=4 OMPI_COMM_WORLD_RANK=0 python main_all.py -l2 6e-7 -n_epochs 2 -warm 2 -prune 1 -sparse 0.90  -prune_deep 1 -prune_fm 1 -prune_r 1 -use_fwlw 1 -emb_r 0.444 -emb_corr 1. -backend gloo -batch_size 2048 -gpu 0  -init tcp://IP_OF_NODE0:FREEPORT
+
+    NCCL_DEBUG=INFO LOCAL_RANK=1 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=eth0 OMPI_COMM_WORLD_SIZE=4 OMPI_COMM_WORLD_RANK=1 python main_all.py -l2 6e-7 -n_epochs 2 -warm 2 -prune 1 -sparse 0.90  -prune_deep 1 -prune_fm 1 -prune_r 1 -use_fwlw 1 -emb_r 0.444 -emb_corr 1. -backend gloo -batch_size 2048 -gpu 1  -init tcp://IP_OF_NODE0:FREEPORT
 
 Worker 1:
 
-    CUDA_VISIBLE_DEVICES=0 GLOO_SOCKET_IFNAME=eth0 OMPI_COMM_WORLD_SIZE=2 OMPI_COMM_WORLD_RANK=1 OMPI_COMM_WORLD_LOCAL_RANK=0 python main_all.py -l2 6e-7 -n_epochs 2 -warm 2 -prune 1 -sparse 0.90  -prune_deep 1 -prune_fm 1 -prune_r 1 -use_fwlw 1 -emb_r 0.444 -emb_corr 1. -backend gloo -batch_size 2048  -init tcp://IP_OF_NODE0:FREEPORT
+    NCCL_DEBUG=INFO LOCAL_RANK=0 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=eth0 OMPI_COMM_WORLD_SIZE=4 OMPI_COMM_WORLD_RANK=2 python main_all.py -l2 6e-7 -n_epochs 2 -warm 2 -prune 1 -sparse 0.90  -prune_deep 1 -prune_fm 1 -prune_r 1 -use_fwlw 1 -emb_r 0.444 -emb_corr 1. -backend gloo -batch_size 2048 -gpu 0  -init tcp://IP_OF_NODE0:FREEPORT
+
+    NCCL_DEBUG=INFO LOCAL_RANK=1 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=eth0 OMPI_COMM_WORLD_SIZE=4 OMPI_COMM_WORLD_RANK=3 python main_all.py -l2 6e-7 -n_epochs 2 -warm 2 -prune 1 -sparse 0.90  -prune_deep 1 -prune_fm 1 -prune_r 1 -use_fwlw 1 -emb_r 0.444 -emb_corr 1. -backend gloo -batch_size 2048 -gpu 1  -init tcp://IP_OF_NODE0:FREEPORT

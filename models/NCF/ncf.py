@@ -29,7 +29,7 @@ def init_distributed(args):
     if args.distributed:
         print('distributed')
         args.rank = int(os.environ['OMPI_COMM_WORLD_RANK'])
-        args.local_rank = int(os.environ['OMPI_COMM_WORLD_LOCAL_RANK'])
+        args.local_rank = int(os.environ['LOCAL_RANK'])
 
         '''
         Set cuda device so everything is done on the right GPU.
@@ -203,12 +203,13 @@ def main():
     mlperf_log.ncf_print(key=mlperf_log.OPT_HP_ADAM_EPSILON, value=args.eps)
     mlperf_log.ncf_print(key=mlperf_log.MODEL_HP_LOSS_FN, value=mlperf_log.BCE)
 
-    if use_cuda:
-        # Move model and loss to GPU
-        model = model.cuda()
-        criterion = criterion.cuda()
-    if args.distributed:
-        model=DDP(model)
+    with torch.cuda.device(args.local_rank):
+        if use_cuda:
+            # Move model and loss to GPU
+            model = model.cuda()
+            criterion = criterion.cuda()
+        if args.distributed:
+            model=DDP(model, device_ids=[args.local_rank])
     local_batch = args.batch_size
     traced_criterion = torch.jit.trace(criterion.forward, (torch.rand(local_batch,1),torch.rand(local_batch,1)))
     success = False
@@ -232,9 +233,9 @@ def main():
         print("number batches: ", num_batches)
         for i in range(num_batches):
             # selecting input from prepared data
-            user = epoch_users_list[i%5].cuda()
-            item = epoch_items_list[i%5].cuda()
-            label = epoch_label_list[i%5].view(-1,1).cuda()
+            user = epoch_users_list[i%5].cuda(args.local_rank)
+            item = epoch_items_list[i%5].cuda(args.local_rank)
+            label = epoch_label_list[i%5].view(-1,1).cuda(args.local_rank)
 
             for p in model.parameters():
                 p.grad = None

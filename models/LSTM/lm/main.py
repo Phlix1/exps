@@ -29,7 +29,7 @@ def init_dist(shared_path='~', backend='nccl', init='tcp://127.0.0.1:4000', set_
         print('WARNING: world size is 1')
 
     rank = int(os.environ['OMPI_COMM_WORLD_RANK'])
-    local_rank = int(os.environ['OMPI_COMM_WORLD_LOCAL_RANK'])
+    local_rank = int(os.environ['LOCAL_RANK'])
     if set_cuda_visible_devices:
         os.environ['CUDA_VISIBLE_DEVICES'] = str(local_rank)
 
@@ -139,12 +139,13 @@ ss = SampledSoftmax(ntokens, nsampled, D, tied_weight=twht)
 
 net.add_module("encoder", encoder)
 net.add_module("decoder", ss)
-net.cuda()
-tmp_net=net
-if world_size>=1:
-    tmp_net = DDP(net)
-tmp_net.init_hidden = net.init_hidden
-net = tmp_net
+with torch.cuda.device(local_rank):
+    net.cuda()
+    tmp_net=net
+    if world_size>=1:
+        tmp_net = DDP(net, device_ids=[local_rank])
+    tmp_net.init_hidden = net.init_hidden
+    net = tmp_net
 
 print("Batch Size:", args.batch_size*args.scale, "Initial LR:", args.lr*args.scale)
 criterion = nn.CrossEntropyLoss()
@@ -199,8 +200,7 @@ def train():
     hidden = net.init_hidden(args.batch_size*args.scale)
     for batch, item in enumerate(train_loader):
         net.train()
-        data, targets, word_cnt, batch_len = get_batch(item)
-
+        data, targets, word_cnt, batch_len = get_batch(item, local_rank)
         # Starting each batch, we detach the hidden state from how it was previously produced.
         # If we didn't, the model would try backpropagating all the way to start of the dataset.
         hidden = repackage_hidden(hidden)

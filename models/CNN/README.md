@@ -29,17 +29,25 @@ Aggregator 0 and aggregator 1:
 #### ResNet152
 Worker 0:
 
-    CUDA_VISIBLE_DEVICES=0 GLOO_SOCKET_IFNAME=eth0 python main.py -a resnet152 --lr 0.1 --world-size 2 --rank 0 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
+    NCCL_DEBUG=INFO LOCAL_RANK=0 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=ens1f1 python main.py -a resnet152 --lr 0.1 --world-size 4 --rank 0 --local_rank 0 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
+
+    NCCL_DEBUG=INFO LOCAL_RANK=1 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=ens1f1 python main.py -a resnet152 --lr 0.1 --world-size 4 --rank 1 --local_rank 1 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
 
 Worker 1:
 
-    CUDA_VISIBLE_DEVICES=0 GLOO_SOCKET_IFNAME=eth0 python main.py -a resnet152 --lr 0.1 --world-size 2 --rank 1 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
+    NCCL_DEBUG=INFO LOCAL_RANK=0 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=ens1f1 python main.py -a resnet152 --lr 0.1 --world-size 4 --rank 2 --local_rank 0 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
+
+    NCCL_DEBUG=INFO LOCAL_RANK=1 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=ens1f1 python main.py -a resnet152 --lr 0.1 --world-size 4 --rank 3 --local_rank 1 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
 
 #### VGG19
 Worker 0:
 
-    CUDA_VISIBLE_DEVICES=0 GLOO_SOCKET_IFNAME=eth0 python main.py -a vgg19 --lr 0.01 --world-size 2 --rank 0 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
+    NCCL_DEBUG=INFO LOCAL_RANK=0 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=ens1f1 python main.py -a vgg19 --lr 0.01 --world-size 4 --rank 0 --local_rank 0 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
+
+    NCCL_DEBUG=INFO LOCAL_RANK=1 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=ens1f1 python main.py -a vgg19 --lr 0.01 --world-size 4 --rank 1 --local_rank 1 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
 
 Worker 1:
 
-    CUDA_VISIBLE_DEVICES=0 GLOO_SOCKET_IFNAME=eth0 python main.py -a vgg19 --lr 0.01 --world-size 2 --rank 1 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
+    NCCL_DEBUG=INFO LOCAL_RANK=0 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=ens1f1 python main.py -a vgg19 --lr 0.01 --world-size 4 --rank 2 --local_rank 0 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
+
+    NCCL_DEBUG=INFO LOCAL_RANK=1 CUDA_VISIBLE_DEVICES=0,1 GLOO_SOCKET_IFNAME=ens1f1 python main.py -a vgg19 --lr 0.01 --world-size 4 --rank 3 --local_rank 1 --dist-url tcp://IP_OF_NODE0:FREEPORT --dist-backend gloo  ./dataset/
